@@ -19,14 +19,23 @@ AMFSAudioProcessor::AMFSAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
+         // The Default Value Tree State
                        ), apvts(*this, nullptr, "Parameters", createParams())
 #endif
 {
-    juce::AudioChannelSet::stereo();
+    // Register the basic formats
+    formatManager.registerBasicFormats();
+
+    // Loop through the total number of voices and add a default SamplerVoice class for each one.
+    for (int i = 0; i < numVoices; ++i)
+    {
+        synthGranular.addVoice(new juce::SamplerVoice());
+    }
 }
 
 AMFSAudioProcessor::~AMFSAudioProcessor()
 {
+    reader = nullptr;
 }
 
 //==============================================================================
@@ -94,8 +103,8 @@ void AMFSAudioProcessor::changeProgramName (int index, const juce::String& newNa
 //==============================================================================
 void AMFSAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    // Needs to be called for any playback to happen.
+    synthGranular.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void AMFSAudioProcessor::releaseResources()
@@ -136,31 +145,18 @@ void AMFSAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
 
-    }
-
+    // Get the values for the 3 Buttons via apvts
     auto& open = *apvts.getRawParameterValue("OPEN");
     auto& play = *apvts.getRawParameterValue("PLAY");
     auto& stop = *apvts.getParameter("STOP");
 
+    // Do the default renderNextBlock for synthGranular.
+    synthGranular.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
 
 /*juce::AudioProcessorValueTreeState::Listener AMFSAudioProcessor::stopButtonClicked()
@@ -193,16 +189,53 @@ void AMFSAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     // whose contents will have been created by the getStateInformation() call.
 }
 
+void AMFSAudioProcessor::loadFile()
+{
+    // Create a FileChooser pointer that only opens wav files.
+    chooser = std::make_unique<juce::FileChooser>("Select a Wave file...", juce::File{}, "*.wav");
+
+    // Set the flags for the chooser.
+    auto chooserFlags = juce::FileBrowserComponent::openMode
+        | juce::FileBrowserComponent::canSelectFiles;
+
+    // Launch into async
+    chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& fc)
+        {
+            // Get the results of what was chosen.
+            auto file = fc.getResult();
+
+            // If the file is not null.
+            if (file != juce::File{})
+            {
+                // Create a reader format transmission from file to reader.
+                reader = formatManager.createReaderFor(file);
+
+                // If the reader ptr is not null
+                if (reader != nullptr)
+                {
+                    // Create a range of all the keys on the keyboard.
+                    juce::BigInteger range;
+                    range.setRange(0, 128, true);
+
+                    // Use the default method to add the sound to the sampler.
+                    synthGranular.addSound(new juce::SamplerSound("Sample", *reader, range, 60, 0.1f, 0.1f, 20.0f));
+                }
+            }
+        });
+}
 juce::AudioProcessorValueTreeState::ParameterLayout AMFSAudioProcessor::createParams()
 {
+    // Create the beginnings of the apvts tree
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
+    // Add on 3 button parameters.
     params.push_back(std::make_unique<juce::AudioParameterBool>("OPEN", "Open", true));
     params.push_back(std::make_unique<juce::AudioParameterBool>("PLAY", "Play", true));
     params.push_back(std::make_unique<juce::AudioParameterBool>("STOP", "Stop", true));
 
     return { params.begin(), params.end() };
 }
+
 
 //==============================================================================
 // This creates new instances of the plugin..

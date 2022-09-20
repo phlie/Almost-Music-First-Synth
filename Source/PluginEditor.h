@@ -30,6 +30,10 @@ private:
     // access the processor object that created it.
     AMFSAudioProcessor& audioProcessor;
 
+    // For now the only button.
+    juce::TextButton loadButton{ "LOAD ME!" };
+
+    // Temporarilly removed for simplicity.
     AudioComponent audioComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AMFSAudioProcessorEditor)

@@ -73,7 +73,7 @@ void AudioComponent::paint (juce::Graphics& g)
 
 void AudioComponent::resized()
 {
-    openButton.setBounds(10, 10, getWidth() - 20, 20);
+    //openButton.setBounds(10, 10, getWidth() - 20, 20);
     playButton.setBounds(10, 30, getWidth() - 20, 20);
     stopButton.setBounds(10, 50, getWidth() - 20, 20);
 }

@@ -9,6 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+//#include "SamplerSound.h"
+//#include "SamplerVoice.h"
 
 //==============================================================================
 /**
@@ -56,12 +58,28 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    // Used to connect the front end knobs to the backend
     juce::AudioProcessorValueTreeState apvts;
+
+    // Used to load the file async
+    void loadFile();
 private:
+    // Create a Parameter Layout
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
 
-    //juce::AudioProcessorValueTreeState::Listener stopButtonClicked();
+    // Create a synth of class Synthesiser.
+    juce::Synthesiser synthGranular;
 
+    // The total number of voices for the synth is 5
+    const int numVoices{ 5 };
+
+    // Used to choose which file to open
+    std::unique_ptr<juce::FileChooser> chooser;
+
+    // Describes the various formats available.
+    juce::AudioFormatManager formatManager;
+    // Stores the audio data after it has been read
+    juce::AudioFormatReader* reader = nullptr;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AMFSAudioProcessor)

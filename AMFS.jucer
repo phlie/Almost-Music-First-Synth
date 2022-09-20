@@ -18,6 +18,10 @@
       <FILE id="QC8CYF" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="x5CZwp" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="WY8jT7" name="SamplerSound.h" compile="0" resource="0" file="Source/SamplerSound.h"/>
+      <FILE id="EEL1LI" name="SamplerVoice.cpp" compile="1" resource="0"
+            file="Source/SamplerVoice.cpp"/>
+      <FILE id="krMWYa" name="SamplerVoice.h" compile="0" resource="0" file="Source/SamplerVoice.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
