@@ -223,15 +223,28 @@ void AMFSAudioProcessor::loadFile()
             }
         });
 }
+
+void AMFSAudioProcessor::playFile()
+{
+    // Turns C3 on with a velocity of 0.9f;
+    synthGranular.noteOn(1, 60, 0.9f);
+}
+
+void AMFSAudioProcessor::stopFile()
+{
+    // Calls off the pressed note set to middle C.
+    synthGranular.noteOff(1, 60, 1.0f, false);
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout AMFSAudioProcessor::createParams()
 {
     // Create the beginnings of the apvts tree
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
 
     // Add on 3 button parameters.
-    params.push_back(std::make_unique<juce::AudioParameterBool>("OPEN", "Open", true));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("PLAY", "Play", true));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("STOP", "Stop", true));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("OPEN", "Open", false));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("PLAY", "Play", false));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("STOP", "Stop", false));
 
     return { params.begin(), params.end() };
 }

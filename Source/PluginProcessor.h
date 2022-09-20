@@ -63,6 +63,8 @@ public:
 
     // Used to load the file async
     void loadFile();
+    void playFile();
+    void stopFile();
 private:
     // Create a Parameter Layout
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();

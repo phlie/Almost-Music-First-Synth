@@ -11,14 +11,8 @@
 
 //==============================================================================
 AMFSAudioProcessorEditor::AMFSAudioProcessorEditor (AMFSAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), audioComponent(audioProcessor.apvts)
+    : AudioProcessorEditor (&p), audioProcessor (p), audioComponent(audioProcessor) // All components while need the audio processor reference.
 {
-    // Enable the load button
-    loadButton.setButtonText("LOADme.");
-    loadButton.onClick = [&]() { audioProcessor.loadFile(); };
-    addAndMakeVisible(loadButton);
-
-    // Temporarily no bounds are set
     addAndMakeVisible(audioComponent);
     setSize (400, 300);
 }
@@ -40,8 +34,10 @@ void AMFSAudioProcessorEditor::paint (juce::Graphics& g)
 void AMFSAudioProcessorEditor::resized()
 {
     // Give the load button some space.
-    loadButton.setBounds(0, 0, getWidth() - 20, 20);
-    //audioComponent.setBounds(0, 0, getWidth(), getHeight());
+    //loadButton.setBounds(0, 0, getWidth() - 20, 20);
+
+    // Fill the screen with the audio component.
+    audioComponent.setBounds(0, 0, getWidth(), getHeight());
 }
 
 

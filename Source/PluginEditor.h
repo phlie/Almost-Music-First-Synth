@@ -31,7 +31,7 @@ private:
     AMFSAudioProcessor& audioProcessor;
 
     // For now the only button.
-    juce::TextButton loadButton{ "LOAD ME!" };
+    //juce::TextButton loadButton{ "LOAD ME!" };
 
     // Temporarilly removed for simplicity.
     AudioComponent audioComponent;

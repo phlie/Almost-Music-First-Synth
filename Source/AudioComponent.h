@@ -19,7 +19,7 @@
 class AudioComponent  : public juce::Component
 {
 public:
-    AudioComponent(juce::AudioProcessorValueTreeState& apvts);
+    AudioComponent(AMFSAudioProcessor& audioProcessor);
     ~AudioComponent() override;
 
     /*void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
@@ -30,6 +30,8 @@ public:
     void resized() override;
 
 private:
+    AMFSAudioProcessor& ap;
+
     using Attachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
     void openButtonClicked();

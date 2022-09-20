@@ -12,18 +12,24 @@
 #include "AudioComponent.h"
 
 //==============================================================================
-AudioComponent::AudioComponent(juce::AudioProcessorValueTreeState& apvts)
+AudioComponent::AudioComponent(AMFSAudioProcessor& audioProcessor) : ap(audioProcessor) // Set this components reference, ap, to audioProcessor.
 {
+    // The three callbacks for loading, playing, and stopping a file
+    openButton.onClick = [&]() { ap.loadFile(); };
+    playButton.onClick = [&]() { ap.playFile(); };
+    stopButton.onClick = [&]() { ap.stopFile(); };
+
+    // Standard Connections between the Buttons and the AudioProcessor
     openButton.setButtonText("Open!");
-    openButtonAttachment = std::make_unique<Attachment>(apvts, "OPEN", openButton);
+    openButtonAttachment = std::make_unique<Attachment>(ap.apvts, "OPEN", openButton);
     addAndMakeVisible(openButton);
 
     playButton.setButtonText("Play.");
-    playButtonAttachment = std::make_unique<Attachment>(apvts, "PLAY", playButton);
+    playButtonAttachment = std::make_unique<Attachment>(ap.apvts, "PLAY", playButton);
     addAndMakeVisible(playButton);
 
     stopButton.setButtonText("Stop.");
-    stopButtonAttachment = std::make_unique<Attachment>(apvts, "STOP", stopButton);
+    stopButtonAttachment = std::make_unique<Attachment>(ap.apvts, "STOP", stopButton);
     addAndMakeVisible(stopButton);
 }
 
@@ -73,42 +79,10 @@ void AudioComponent::paint (juce::Graphics& g)
 
 void AudioComponent::resized()
 {
-    //openButton.setBounds(10, 10, getWidth() - 20, 20);
-    playButton.setBounds(10, 30, getWidth() - 20, 20);
-    stopButton.setBounds(10, 50, getWidth() - 20, 20);
-}
-
-void AudioComponent::openButtonClicked()
-{
-    chooser = std::make_unique<juce::FileChooser>("Select a Wave file to play...",
-        juce::File{},
-        "*.wav");
-
-    auto chooserFlags = juce::FileBrowserComponent::openMode
-        | juce::FileBrowserComponent::canSelectFiles;
-
-    chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& fc)
-        {
-            auto file = fc.getResult();
-
-            if (file != juce::File{})
-            {
-                auto* reader = formatManager.createReaderFor(file);
-
-                if (reader != nullptr)
-                {
-                    auto newSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
-                    transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
-                    //playButton.setEnabled(true);
-                    readerSource.reset(newSource.release());
-
-                    
-                }
-            }
-        });
-}
-
-void AudioComponent::playButtonClicked()
-{
-    transportSource.start();
+    // The three buttons with the same width and height spaced evenly
+    const auto widthIndent = 10;
+    const auto height = 50;
+    openButton.setBounds(widthIndent, 10, getWidth() - widthIndent * 2, height);
+    playButton.setBounds(widthIndent, openButton.getBottom() + 10, getWidth() - widthIndent * 2, height);
+    stopButton.setBounds(widthIndent, playButton.getBottom() + 10, getWidth() - widthIndent * 2, height);
 }
