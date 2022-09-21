@@ -21,16 +21,26 @@ AudioComponent::AudioComponent(AMFSAudioProcessor& audioProcessor) : ap(audioPro
 
     // Standard Connections between the Buttons and the AudioProcessor
     openButton.setButtonText("Open!");
-    openButtonAttachment = std::make_unique<Attachment>(ap.apvts, "OPEN", openButton);
+    openButtonAttachment = std::make_unique<BA>(ap.apvts, "OPEN", openButton);
     addAndMakeVisible(openButton);
 
     playButton.setButtonText("Play.");
-    playButtonAttachment = std::make_unique<Attachment>(ap.apvts, "PLAY", playButton);
+    playButtonAttachment = std::make_unique<BA>(ap.apvts, "PLAY", playButton);
     addAndMakeVisible(playButton);
 
     stopButton.setButtonText("Stop.");
-    stopButtonAttachment = std::make_unique<Attachment>(ap.apvts, "STOP", stopButton);
+    stopButtonAttachment = std::make_unique<BA>(ap.apvts, "STOP", stopButton);
     addAndMakeVisible(stopButton);
+
+    numSlicesSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    numSlicesSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
+    numSlicesAttachment = std::make_unique<SA>(ap.apvts, "NUM SLICES", numSlicesSlider);
+    addAndMakeVisible(numSlicesSlider);
+
+    playLengthSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    playLengthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
+    playLengthAttachment = std::make_unique<SA>(ap.apvts, "PLAY LENGTH", playLengthSlider);
+    addAndMakeVisible(playLengthSlider);
 }
 
 AudioComponent::~AudioComponent()
@@ -85,4 +95,7 @@ void AudioComponent::resized()
     openButton.setBounds(widthIndent, 10, getWidth() - widthIndent * 2, height);
     playButton.setBounds(widthIndent, openButton.getBottom() + 10, getWidth() - widthIndent * 2, height);
     stopButton.setBounds(widthIndent, playButton.getBottom() + 10, getWidth() - widthIndent * 2, height);
+
+    numSlicesSlider.setBounds(widthIndent, stopButton.getBottom() + 20, 125, 125);
+    playLengthSlider.setBounds(numSlicesSlider.getRight(), stopButton.getBottom() + 20, 125, 125);
 }

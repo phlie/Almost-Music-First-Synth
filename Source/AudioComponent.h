@@ -32,7 +32,7 @@ public:
 private:
     AMFSAudioProcessor& ap;
 
-    using Attachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    using BA = juce::AudioProcessorValueTreeState::ButtonAttachment;
 
     void openButtonClicked();
     void playButtonClicked();
@@ -41,9 +41,17 @@ private:
     juce::TextButton playButton;
     juce::TextButton stopButton;
 
-    std::unique_ptr<Attachment> openButtonAttachment;
-    std::unique_ptr<Attachment> playButtonAttachment;
-    std::unique_ptr<Attachment> stopButtonAttachment;
+    std::unique_ptr<BA> openButtonAttachment;
+    std::unique_ptr<BA> playButtonAttachment;
+    std::unique_ptr<BA> stopButtonAttachment;
+
+    using SA = juce::AudioProcessorValueTreeState::SliderAttachment;
+
+    juce::Slider numSlicesSlider;
+    juce::Slider playLengthSlider;
+
+    std::unique_ptr<SA> numSlicesAttachment;
+    std::unique_ptr<SA> playLengthAttachment;
 
     std::unique_ptr<juce::FileChooser> chooser;
 

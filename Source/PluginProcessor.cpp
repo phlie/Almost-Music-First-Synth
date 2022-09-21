@@ -155,6 +155,15 @@ void AMFSAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     auto& play = *apvts.getRawParameterValue("PLAY");
     auto& stop = *apvts.getParameter("STOP");
 
+    auto& numSlices = *apvts.getRawParameterValue("NUM SLICES");
+    auto& playLength = *apvts.getRawParameterValue("PLAY LENGTH");
+
+    if (auto casted = dynamic_cast<SamplerVoice*>(synthGranular.getVoice(0)))
+    {
+        casted->setKnobParams(numSlices.load(), playLength.load());
+    }
+
+
     // Do the default renderNextBlock for synthGranular.
     synthGranular.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 }
@@ -245,6 +254,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout AMFSAudioProcessor::createPa
     params.push_back(std::make_unique<juce::AudioParameterBool>("OPEN", "Open", false));
     params.push_back(std::make_unique<juce::AudioParameterBool>("PLAY", "Play", false));
     params.push_back(std::make_unique<juce::AudioParameterBool>("STOP", "Stop", false));
+
+    
+    params.push_back(std::make_unique<juce::AudioParameterInt>("NUM SLICES", "Num Slices", 1, 32, 4));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("PLAY LENGTH", "Play Length", 0.01f, 1.0f, 0.25f));
 
     return { params.begin(), params.end() };
 }

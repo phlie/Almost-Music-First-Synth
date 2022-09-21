@@ -46,6 +46,11 @@ void SamplerVoice::pitchWheelMoved(int newPitchWheelValue)
 
 }
 
+void SamplerVoice::setKnobParams(int ns, float pl)
+{
+    numSlices = ns;
+    playLength = pl;
+}
 
 void SamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
@@ -59,23 +64,45 @@ void SamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int s
         alreadyLoadedBuffer = true;
         currentStartPosInBuffer = 0;
     }
+
     
 
     if (alreadyLoadedBuffer)
     {
+        int lengthOfEachSlice = lengthOfBuffer / numSlices;
+        int amountToPlayOfEachSlice = lengthOfEachSlice * playLength;
+        int currentChangeSample = 0;
+        int startForThisTime = currentPlayingSplice * lengthOfEachSlice + positionInSplice;
         for (int channel = 0; channel < outputBuffer.getNumChannels(); channel++)
         {
             for (int sample = 0; sample < numSamples; sample++)
             {
-                if (sample + currentStartPosInBuffer > lengthOfBuffer)
+                if (positionInSplice + sample > amountToPlayOfEachSlice)
                 {
-                    currentStartPosInBuffer = 0;
+                    positionInSplice = 0;
+                    currentChangeSample = sample;
+                    currentPlayingSplice += 1;
+                    if (currentPlayingSplice >= numSlices)
+                    {
+                        currentPlayingSplice = 0;
+                    }
+                    startForThisTime = currentPlayingSplice * lengthOfEachSlice + positionInSplice;
                 }
-                outputBuffer.addSample(channel, sample, buffer->getSample(0, sample + currentStartPosInBuffer));
+                    /*currentPlayingSplice++;
+                    positionInSplice = 0;
+                    startForThisTime = currentPlayingSplice * lengthOfEachSlice + positionInSplice;
+                    if (currentPlayingSplice > numSlices)
+                    {
+                        currentPlayingSplice = 0;
+                    } */
+                
+
+                outputBuffer.addSample(channel, sample, buffer->getSample(0, sample + startForThisTime));
             }
         }
+        positionInSplice += numSamples - currentChangeSample;
         //currentStartPosInBuffer += numSamples;
-        currentStartPosInBuffer = currentStartPosInBuffer + lengthOfBuffer / 512;
+        //currentStartPosInBuffer = currentStartPosInBuffer + lengthOfBuffer / 512;
     }
     //juce::SamplerVoice::renderNextBlock(outputBuffer, startSample, numSamples);
     /*if (!isVoiceActive()) { return; }
