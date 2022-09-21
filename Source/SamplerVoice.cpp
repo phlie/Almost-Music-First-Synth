@@ -30,8 +30,7 @@ void SamplerVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesis
 {
     if (auto* sound = dynamic_cast<const juce::SamplerSound*> (s))
     {
-        pitchRatio = std::pow(2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
-            * sound->sourceSampleRate / getSampleRate();
+        pitchRatio = std::pow(2.0, (midiNoteNumber - 60) / 12.0);
 
         //sourceSamplePosition = 0.0;
         //lgain = velocity;
@@ -50,7 +49,7 @@ void SamplerVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesis
 
 void SamplerVoice::stopNote(float velocity, bool allowTailOff)
 {
-    juce::SamplerVoice::stopNote(velocity, allowTailOff);
+    clearCurrentNote();
 }
 
 void SamplerVoice::controllerMoved(int controllerNumber, int newControllerValue)
@@ -75,7 +74,7 @@ void SamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int s
 
     if (!alreadyLoadedBuffer)
     {
-        auto currentSound = dynamic_cast<juce::SamplerSound> (getCurrentlyPlayingSound().get());
+        auto currentSound = dynamic_cast<juce::SamplerSound*> (getCurrentlyPlayingSound().get());
         if (currentSound == nullptr) { return; };
         buffer = currentSound->getAudioData();
         lengthOfBuffer = buffer->getNumSamples();
@@ -90,7 +89,7 @@ void SamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int s
         int lengthOfEachSlice = lengthOfBuffer / numSlices;
         float amountToPlayOfEachSlice = lengthOfEachSlice * playLength;
         float currentChangeSample = 0.0;
-        float startForThisTime = currentPlayingSplice * lengthOfEachSlice + positionInSplice;
+        double startForThisTime = currentPlayingSplice * lengthOfEachSlice + positionInSplice;
         for (int channel = 0; channel < outputBuffer.getNumChannels(); channel++)
         {
             float sample = 0.0f;
@@ -110,7 +109,7 @@ void SamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int s
                     }
                     startForThisTime = currentPlayingSplice * lengthOfEachSlice + positionInSplice;
                 }
-                if (positionInSplice < 0.0)
+                /*if (positionInSplice < 0.0)
                 {
                     positionInSplice = amountToPlayOfEachSlice;
                     currentChangeSample = (int)sample;
@@ -130,7 +129,8 @@ void SamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int s
 
                 outputBuffer.addSample(channel, bufferSample, buffer->getSample(0, (int)(sample + startForThisTime)));
                 bufferSample++;
-                sample = sample + playbackTime;
+                //sample = sample + pow(2, (playbackTime - 1.0)) - 1  + pitchRatio - 1;
+                sample = sample + pitchRatio + pow(2, playbackTime - 1) - 1;
             }
         }
         positionInSplice += numSamples - currentChangeSample;
