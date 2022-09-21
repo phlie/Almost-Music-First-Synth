@@ -41,6 +41,11 @@ AudioComponent::AudioComponent(AMFSAudioProcessor& audioProcessor) : ap(audioPro
     playLengthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
     playLengthAttachment = std::make_unique<SA>(ap.apvts, "PLAY LENGTH", playLengthSlider);
     addAndMakeVisible(playLengthSlider);
+
+    playbackTimeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    playbackTimeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
+    playbackTimeAttachment = std::make_unique<SA>(ap.apvts, "PLAYBACK TIME", playbackTimeSlider);
+    addAndMakeVisible(playbackTimeSlider);
 }
 
 AudioComponent::~AudioComponent()
@@ -98,4 +103,5 @@ void AudioComponent::resized()
 
     numSlicesSlider.setBounds(widthIndent, stopButton.getBottom() + 20, 125, 125);
     playLengthSlider.setBounds(numSlicesSlider.getRight(), stopButton.getBottom() + 20, 125, 125);
+    playbackTimeSlider.setBounds(playLengthSlider.getRight(), stopButton.getBottom() + 20, 125, 125);
 }

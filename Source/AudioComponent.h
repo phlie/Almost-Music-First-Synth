@@ -49,9 +49,11 @@ private:
 
     juce::Slider numSlicesSlider;
     juce::Slider playLengthSlider;
+    juce::Slider playbackTimeSlider;
 
     std::unique_ptr<SA> numSlicesAttachment;
     std::unique_ptr<SA> playLengthAttachment;
+    std::unique_ptr<SA> playbackTimeAttachment;
 
     std::unique_ptr<juce::FileChooser> chooser;
 

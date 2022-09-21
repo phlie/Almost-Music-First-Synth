@@ -157,10 +157,11 @@ void AMFSAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
     auto& numSlices = *apvts.getRawParameterValue("NUM SLICES");
     auto& playLength = *apvts.getRawParameterValue("PLAY LENGTH");
+    auto& playbackTime = *apvts.getRawParameterValue("PLAYBACK TIME");
 
     if (auto casted = dynamic_cast<SamplerVoice*>(synthGranular.getVoice(0)))
     {
-        casted->setKnobParams(numSlices.load(), playLength.load());
+        casted->setKnobParams(numSlices.load(), playLength.load(), playbackTime.load());
     }
 
 
@@ -258,6 +259,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout AMFSAudioProcessor::createPa
     
     params.push_back(std::make_unique<juce::AudioParameterInt>("NUM SLICES", "Num Slices", 1, 32, 4));
     params.push_back(std::make_unique<juce::AudioParameterFloat>("PLAY LENGTH", "Play Length", 0.01f, 1.0f, 0.25f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("PLAYBACK TIME", "Playback Time", juce::NormalisableRange(-4.0f, 4.0f, 1.0f/12.0f), 1.0f));
 
     return { params.begin(), params.end() };
 }

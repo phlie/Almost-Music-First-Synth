@@ -38,14 +38,14 @@ public:
     void renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) override;
     using juce::SynthesiserVoice::renderNextBlock;
 
-    void setKnobParams(int ns, float pl);
+    void setKnobParams(int ns, float pl, float pt);
 private:
     juce::AudioSampleBuffer* buffer;
     int currentStartPosInBuffer = 0;
     int lengthOfBuffer = 0;
     bool alreadyLoadedBuffer = false;
     int currentPlayingSplice = 0;
-    int positionInSplice = 0;
+    float positionInSplice = 0.0f;
 
     juce::Random rand;
 
@@ -57,5 +57,6 @@ private:
 
     int numSlices = 1;
     float playLength = 1.0f;
+    float playbackTime = 1.0f;
 };
 
