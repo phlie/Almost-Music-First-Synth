@@ -29,7 +29,7 @@ AMFSAudioProcessor::AMFSAudioProcessor()
     // Loop through the total number of voices and add a default SamplerVoice class for each one.
     for (int i = 0; i < numVoices; ++i)
     {
-        synthGranular.addVoice(new juce::SamplerVoice());
+        synthGranular.addVoice(new SamplerVoice());
     }
 }
 
