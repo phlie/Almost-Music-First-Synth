@@ -73,7 +73,7 @@ private:
     juce::Synthesiser synthGranular;
 
     // The total number of voices for the synth is 5
-    const int numVoices{ 1 };
+    const int numVoices{ 7 };
 
     // Used to choose which file to open
     std::unique_ptr<juce::FileChooser> chooser;
